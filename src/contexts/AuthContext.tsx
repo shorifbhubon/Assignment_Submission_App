@@ -60,33 +60,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   };
 
-  const signUp = async (email: string, password: string, fullName: string, role: 'teacher' | 'student') => {
+  const signUp = async (
+    email: string,
+    password: string,
+    fullName: string,
+    role: 'teacher' | 'student'
+  ) => {
     try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
+      // ✅ Send full_name and role as user metadata
+      const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
-      });
-
-      if (signUpError) throw signUpError;
-
-      if (data.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: data.user.id,
-            email,
+        options: {
+          data: {
             full_name: fullName,
-            role,
-          });
-
-        if (profileError) throw profileError;
-      }
-
+            role, // 👈 pass role metadata here!
+          },
+        },
+      });
+  
+      if (signUpError) throw signUpError;
+  
+      // 👇 Remove manual insert into profiles
+      // The database trigger will handle it automatically
+  
       return { error: null };
     } catch (error) {
       return { error: error as Error };
     }
   };
+  
 
   const signIn = async (email: string, password: string) => {
     try {

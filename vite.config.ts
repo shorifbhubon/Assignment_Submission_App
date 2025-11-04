@@ -7,4 +7,6 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  // 👇 Add this line (use your actual repo name)
+  base: '/Assignment_Submission_App/',
 });
